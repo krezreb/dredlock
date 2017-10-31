@@ -1,7 +1,12 @@
+# Getting Started
+
+
 ```
 docker-compose build
 docker-compose up
 ```
+
+Initial logs from docker
 
 ```
 handle_1  | ['hello-world.py']
@@ -13,11 +18,49 @@ handle_1  | connecting to redis
 handle_1  | while true
 ```
 
+Now feed a key and value into redis, in this case "poo" into the list "jobs"
+
 ```
 docker-compose exec handle python push_to_redis.py jobs poo
 ```
+
+Back in the docker logs we see that our handle got the message
 
 ```
 handle_1  | got a jobs poo
 handle_1  | while true
 ```
+
+Now let's scale up!
+
+```
+docker-compose scale handle=3
+```
+
+```
+Starting hhhhelloworld_handle_1 ... done
+Creating hhhhelloworld_handle_2 ... 
+Creating hhhhelloworld_handle_3 ... 
+Creating hhhhelloworld_handle_2 ... done
+Creating hhhhelloworld_handle_3 ... done
+```
+
+```
+docker-compose ps
+```
+
+```
+         Name                       Command               State    Ports   
+ --------------------------------------------------------------------------
+hhhhelloworld_handle_1   python -u hello-world.py         Up               
+hhhhelloworld_handle_2   python -u hello-world.py         Up               
+hhhhelloworld_handle_3   python -u hello-world.py         Up               
+hhhhelloworld_redis_1    docker-entrypoint.sh redis ...   Up      6379/tcp 
+```
+
+
+Feed more values into redis and watch which instance of handle receives it.
+
+
+
+
