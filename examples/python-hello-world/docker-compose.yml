@@ -11,6 +11,7 @@ services:
             - redis:redis
         env_file: 
             - .env
+        command: python -u hello-world.py
     
     redis:
         image: redis:alpine
