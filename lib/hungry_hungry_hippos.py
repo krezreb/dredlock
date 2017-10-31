@@ -59,7 +59,10 @@ class HungryHungryHippos(object):
     @property
     def thread(self):
         return self.t
-    
+
+    def blpop(self, keys=[]):
+        (k,v) = self.r.blpop(keys, 0)
+        return (k,v)
     
     def blpop_lock(self, keys=[]):
         (k,v) = self.r.blpop(keys, 0)

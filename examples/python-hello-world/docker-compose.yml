@@ -4,12 +4,13 @@ services:
         
     handle:
         restart: "no"
-        build: .
+        build: 
+            context: ../../
+            dockerfile: Dockerfile
         links:
             - redis:redis
         env_file: 
             - .env
-        command: python -u manage.py handle_run 
     
     redis:
         image: redis:alpine
