@@ -1,0 +1,70 @@
+version : '2'
+
+services:
+    nginx:
+        build: ../nginx_le/
+        ports:
+            - "${NGINX_PORT}:443"
+        volumes:
+            - /www/static
+            - sslcert:/sslcert
+            - wwwlogs:/var/log/nginx
+        volumes_from:
+            - django
+        links:
+            - django:django
+         
+    django:
+        build: 
+            context: ../
+            dockerfile: Dockerfile.TP_webhook_service
+        expose:
+            - "8000"
+        volumes:
+            - djangostatic:/usr/src/app/static
+            - djangologs:/var/log/django
+            - djangomigrations:/djangomigrations
+            
+        links:
+            - postgres:postgres
+            - redis:redis
+            
+        env_file: 
+            - .env
+        command: uwsgi --ini /usr/src/app/uwsgi.ini
+        
+    handle:
+        restart: "no"
+        build: 
+            context: ../
+            dockerfile: Dockerfile.TP_webhook_service
+        links:
+            - postgres:postgres
+            - redis:redis
+        volumes:
+            - djangologs:/var/log/django
+        env_file: 
+            - .env
+        command: python -u manage.py handle_run 
+    
+    redis:
+        image: redis:alpine
+        expose:
+            - "6379"
+     
+    postgres:
+        image: postgres:latest
+        expose:
+            - "5432"
+        volumes:
+            - pgdata:/var/lib/postgresql/data/
+    
+volumes:
+    pgdata:
+    djangologs:
+    djangostatic:
+    djangomigrations:
+    sslcert:
+    wwwlogs:
+    
+    
