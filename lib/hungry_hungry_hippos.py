@@ -4,12 +4,13 @@
 import redis
 import time
 import threading
+import signal
 
 class HungryHungryHippos(object):
-    
+
     def __init__(self, host='redis', port=6379, db=0):
         self.r = redis.StrictRedis(host=host, port=port, db=db)
-    
+        
     def _getkeys(self, k):
         lock_key = u'{}:{}'.format(k,'lock')
         keepalive_key = u'{}:{}'.format(k,'keepalive')
@@ -110,3 +111,45 @@ class HungryHungryHippos(object):
             
         return (lock_success, k, v)
 
+
+class ExitSignalCaught(Exception):
+    pass
+
+
+class HungryHungryHipposCatchSignals(HungryHungryHippos):
+    kill_now = False
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+    def exit_gracefully(self, signum, frame):
+        self.kill_now = True
+
+    def blpop(self, keys=[]):
+        if self.kill_now == True:
+            raise ExitSignalCaught()
+
+        (k,v) = super(HungryHungryHipposCatchSignals, self).blpop(keys)
+        
+        if self.kill_now == True:
+            self.r.rpush(k, v)
+            raise ExitSignalCaught()
+        
+        return (k,v)
+        
+        
+    def blpop_lock(self, keys=[]):
+        if self.kill_now == True:
+            raise ExitSignalCaught()
+        
+        (lock_success, k,v) = super(HungryHungryHipposCatchSignals, self).blpop_lock(keys)
+        
+        if self.kill_now == True:
+            if lock_success == True:
+                self.release_lock(v)
+                
+            self.r.rpush(k, v) # put it back where you found it
+            raise ExitSignalCaught()
+        
+        return (lock_success, k,v)
+    
