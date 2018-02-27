@@ -15,4 +15,4 @@ print 'connecting to redis'
 while True:
     print 'while true'
     (k,v) = hhh.blpop(keys)
-    print "got a {} {}".format(k,v)
+    #print "got a {} {}".format(k,v)
