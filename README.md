@@ -10,7 +10,7 @@ The advantage of this approche, compared to multithreading, is that is can be ap
 # Key concepts
 
 - Process isolation
-- Shared locks
+- Destributed locks (see https://redis.io/topics/distlock)
 - Command orchestration
 
 # Toolchain
