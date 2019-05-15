@@ -5,7 +5,7 @@ import os, sys
 
 print sys.argv 
 
-from lib.hungry_hungry_hippos import HungryHungryHippos
+from hungry_hungry_hippos import HungryHungryHippos
 
 keys = ("jobs")
 hhh = HungryHungryHippos()
