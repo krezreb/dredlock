@@ -5,3 +5,6 @@
 .settings/*
 
 *.env
+dist/
+build/
+hungry_hungry_hippos.egg-info
