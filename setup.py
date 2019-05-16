@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
     
 setup(name='hungry_hungry_hippos',
-    version='0.3',
+    version='0.4',
     description='A python implementation of redlock, with examples',
     long_description=long_description,
     long_description_content_type="text/markdown",      

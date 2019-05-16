@@ -28,7 +28,7 @@ The advantage of this approch, compared to multithreading, is that is can be app
 - docker-compose - building, linking services, scaling services
 - redis - in memory key-value database
 
-# installation
+# Installation
 
 <code>pip install hungry-hungry-hippos</code>
 

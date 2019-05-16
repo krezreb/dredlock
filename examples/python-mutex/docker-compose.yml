@@ -4,11 +4,11 @@ services:
         
     handle:
         restart: "no"
+        build: .
         links:
             - redis:redis
-        env_file: 
-            - .env
-    
+        depends_on:
+            - redis    
     redis:
         image: redis:alpine
         expose:

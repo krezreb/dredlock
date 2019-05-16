@@ -7,4 +7,4 @@ RUN pip install hungry-hungry-hippos
 
 COPY *py /usr/app/
 
-CMD python -u hello-world-catchsigterm.py 
+CMD python -u mutex.py

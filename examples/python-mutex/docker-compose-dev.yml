@@ -4,11 +4,13 @@ services:
         
     handle:
         restart: "no"
+        build: 
+            context: ../../
+            dockerfile: ./examples/python-mutex/Dockerfile-dev
         links:
             - redis:redis
-        env_file: 
-            - .env
-    
+        depends_on:
+            - redis    
     redis:
         image: redis:alpine
         expose:

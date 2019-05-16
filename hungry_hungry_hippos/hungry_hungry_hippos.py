@@ -9,8 +9,10 @@ import sys, logging
 
 class HungryHungryHippos(object):
 
-    def __init__(self, host='redis', port=6379, db=0, logger=None):
+    def __init__(self, host='redis', port=6379, db=0, logger=None, namespace='default'):
         self.r = redis.StrictRedis(host=host, port=port, db=db)
+        
+        self.namespace = namespace
         
         if logger == None:
             self.logger = logging.getLogger('hungry_hungry_hippos')
@@ -28,23 +30,59 @@ class HungryHungryHippos(object):
         self.logger.info(str)    
     
     def _getkeys(self, k):
-        lock_key = u'{}:{}'.format(k, 'lock')
-        keepalive_key = u'{}:{}'.format(k, 'keepalive')
+        lock_key = u'{}:{}:{}'.format(self.namespace, k, 'lock')
+        keepalive_key = u'{}:{}:{}'.format(self.namespace, k, 'keepalive')
+        freed_lock = u'{}:{}:{}'.format(self.namespace, k, 'freed_lock')
         
-        return (lock_key, keepalive_key)
+        return (lock_key, keepalive_key, freed_lock)
 
     def release_lock(self, v):
         # self.log(u'Releasing lock {}'.format(v)
-        (lock_key, keepalive_key) = self._getkeys(v)
+        (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
 
         pipe = self.r.pipeline()
         pipe.expire(lock_key, '0')
         pipe.expire(keepalive_key, '0')
+        pipe.rpush(freed_lock, "DONE")  # freed_lock
+        pipe.expire(freed_lock, 10)  # freed_lock expires in  10 seconds
         pipe.execute()
+        
+    def wait_for_lock(self, v, timeout=None):
+        (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
+        
+        pipe = self.r.pipeline()
+        pipe.llen(lock_key)         # len of lock
+        pipe.llen(keepalive_key)    # len of keepalive_key
+        pipe.llen(freed_lock)       # len of freed_lock
+        result = pipe.execute()
+        
+        if result[0] == 0:
+            # lock does not exist, assume freed
+            return
+        
+        if result[1] == 0:
+            # keepalive_key no longer exists, assume freed
+            return
+        
+        if result[2] > 0:
+            # lock as been freed
+            return
+        
+        # if we get this far then the lock exists and has not yet been freed
+        # we use the brpoplpush to pop and repush to the same list so other
+        # clients doing wait_for_lock will also get it
+        if timeout > 0:
+            # wait here with timeout
+            self.r.brpoplpush(freed_lock, freed_lock, timeout)
+        else:
+            # wait here indefinitely
+            self.r.brpoplpush(freed_lock, freed_lock)
+            
+        # lock ahs been freed
         
     def lock_keepalive(self, v, lock_uuid, sleep=10):
         self.log(u'Starting lock renewal thread for {} with uuid={}'.format(v, lock_uuid))
-        (lock_key, keepalive_key) = self._getkeys(v)
+        (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
         
         pipe = self.r.pipeline()
         pipe.llen(lock_key)  # len of lock
@@ -85,7 +123,7 @@ class HungryHungryHippos(object):
     def blpop_lock(self, keys=[]):
         (k, v) = self.r.blpop(keys, 0)
 
-        (lock_key, keepalive_key) = self._getkeys(v)
+        (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
         
         self.log(u"got a {}".format(v))
         
@@ -109,6 +147,8 @@ class HungryHungryHippos(object):
             self.t.start()
     
             lock_success = True
+            
+            self.r.expire(freed_lock, '0') # expire out any preexisting freed locks NOW
         else :
             lock_success = False
 

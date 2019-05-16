@@ -3,8 +3,11 @@
 
 ```
 docker-compose build
-docker-compose up
+docker-compose up --scale handle=3
 ```
+
+In the above example we've spawed 3 handlers
+
 
 Initial logs from docker
 
@@ -15,51 +18,21 @@ redis_1   | 1:M 31 Oct 15:02:53.756 # WARNING you have Transparent Huge Pages (T
 redis_1   | 1:M 31 Oct 15:02:53.756 * DB loaded from disk: 0.000 seconds
 redis_1   | 1:M 31 Oct 15:02:53.756 * The server is now ready to accept connections on port 6379
 handle_1  | connecting to redis
-handle_1  | while true
-```
-
-Now feed a key and value into redis, in this case "poo" into the list "jobs"
+handle_1  | Entering while true loop, awaiting messages
 
 ```
-docker-compose exec handle python push_to_redis.py jobs poo
-```
 
-Back in the docker logs we see that our handle got the message
+Now feed a key and value into redis, in this case "foo" into the list "jobs"
 
 ```
-handle_1  | got a jobs poo
-handle_1  | while true
+docker-compose exec handle python push_to_redis.py jobs foo
 ```
 
-Now let's scale up!
+Back in the docker logs we see that one and only one of our handlers got the message
 
 ```
-docker-compose scale handle=3
+handle_3  | Received value foo in list jobs
 ```
-
-```
-Starting hhhhelloworld_handle_1 ... done
-Creating hhhhelloworld_handle_2 ... 
-Creating hhhhelloworld_handle_3 ... 
-Creating hhhhelloworld_handle_2 ... done
-Creating hhhhelloworld_handle_3 ... done
-```
-
-```
-docker-compose ps
-```
-
-```
-         Name                       Command               State    Ports   
- --------------------------------------------------------------------------
-hhhhelloworld_handle_1   python -u hello-world.py         Up               
-hhhhelloworld_handle_2   python -u hello-world.py         Up               
-hhhhelloworld_handle_3   python -u hello-world.py         Up               
-hhhhelloworld_redis_1    docker-entrypoint.sh redis ...   Up      6379/tcp 
-```
-
-
-Feed more values into redis and watch which instance of handle receives it.
 
 
 

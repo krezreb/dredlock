@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/python
 
 import os, sys
 
@@ -10,9 +9,9 @@ from hungry_hungry_hippos import HungryHungryHippos
 keys = ("jobs")
 hhh = HungryHungryHippos()
 
-print 'connecting to redis'
-
+print('Entering while true loop, awaiting messages')
 while True:
-    print 'while true'
     (k,v) = hhh.blpop(keys)
-    #print "got a {} {}".format(k,v)
+    print("Received value {} in list {}".format(v,k))
+    
+    # Here is where you can put your application code that does the actual work

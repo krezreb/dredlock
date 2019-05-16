@@ -3,8 +3,8 @@ FROM python:2.7
 RUN mkdir -p /usr/app/
 WORKDIR /usr/app
 
-RUN pip install hungry_hungry_hippos
+RUN pip install hungry-hungry-hippos
 
-COPY examples/python-hello-world/* /usr/app/
+COPY *py /usr/app/
 
 CMD python hello-world.py 

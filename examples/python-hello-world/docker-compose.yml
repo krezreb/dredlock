@@ -4,9 +4,7 @@ services:
         
     handle:
         restart: "no"
-        build: 
-            context: ../../
-            dockerfile: ./examples/python-hello-world/Dockerfile
+        build: .
         links:
             - redis:redis
         env_file: 
