@@ -9,10 +9,16 @@ import sys, logging
 
 class HungryHungryHippos(object):
 
-    def __init__(self, host='redis', port=6379, db=0, logger=None, namespace='default'):
-        self.r = redis.StrictRedis(host=host, port=port, db=db)
+    def __init__(self, host='redis', port=6379, db=0, logger=None, namespace='default', redis_client=None):
         
+        if redis_client == None:
+            self.r = redis.StrictRedis(host=host, port=port, db=db)
+        else:
+            self.r = redis_client
+            
         self.namespace = namespace
+        
+        self.locks = []
         
         if logger == None:
             self.logger = logging.getLogger('hungry_hungry_hippos')
@@ -26,6 +32,15 @@ class HungryHungryHippos(object):
         else:
             self.logger = logger
         
+    def __del__(self):
+        self.log(u"Destructor called, got to clean up locks")
+        self.cleanup()
+        
+    def cleanup(self):    
+        self.log(u"cleanup()")
+        for v in self.locks:
+            self.release_lock(v)
+            
     def log(self, str):
         self.logger.info(str)    
     
@@ -37,7 +52,7 @@ class HungryHungryHippos(object):
         return (lock_key, keepalive_key, freed_lock)
 
     def release_lock(self, v):
-        # self.log(u'Releasing lock {}'.format(v)
+        self.log(u'Releasing lock {}'.format(v))
         (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
 
         pipe = self.r.pipeline()
@@ -46,6 +61,10 @@ class HungryHungryHippos(object):
         pipe.rpush(freed_lock, "DONE")  # freed_lock
         pipe.expire(freed_lock, 10)  # freed_lock expires in  10 seconds
         pipe.execute()
+        
+        if v in self.locks:
+            self.locks.remove(v)
+        
         
     def wait_for_lock(self, v, timeout=None):
         (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
@@ -84,18 +103,18 @@ class HungryHungryHippos(object):
         self.log(u'Starting lock renewal thread for {} with uuid={}'.format(v, lock_uuid))
         (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
         
-        pipe = self.r.pipeline()
-        pipe.llen(lock_key)  # len of lock
-        pipe.lrem(keepalive_key, 0, lock_uuid)  # remove my unique key from lock to get the len
-        pipe.rpush(keepalive_key, lock_uuid)  # put it back
-        result = pipe.execute()
-        
-        # self.log(result
-        
         while True:
+            pipe = self.r.pipeline()
+            pipe.llen(lock_key)  # len of lock
+            pipe.lrem(keepalive_key, 0, lock_uuid)  # remove my unique key from lock to get the len
+            pipe.rpush(keepalive_key, lock_uuid)  # put it back
+            result = pipe.execute()
+            
+            # self.log(result
+        
             if result[0] == 0:
                 # lock no longer exists
-                self.log(u'lock {} disappeared'.format(lock_key))
+                self.log(u'lock {} is gone'.format(lock_key))
                 return
             
             if result[1] == 0:
@@ -105,7 +124,7 @@ class HungryHungryHippos(object):
             
             # self.log(u'renewing lock {} to expire in {} seconds'.format(keepalive_key, sleep*2)
             # set it to expire further in the future
-            self.r.expire(keepalive_key, sleep * 2)   
+            self.r.expire(keepalive_key, sleep + 2)   
             time.sleep(sleep)
 
     def _get_lock_uuid(self):
@@ -144,6 +163,8 @@ class HungryHungryHippos(object):
             # I have the lock
             self.log("Got lock {}".format(lock_key))
             self.t = threading.Thread(target=self.lock_keepalive, args=(v, lock_uuid,))
+            self.t.daemon=True
+            self.locks.append(v)
             self.t.start()
     
             lock_success = True
