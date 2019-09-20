@@ -59,7 +59,7 @@ class HungryHungryHippos(object):
         pipe.expire(lock_key, '0')
         pipe.expire(keepalive_key, '0')
         pipe.rpush(freed_lock, "DONE")  # freed_lock
-        pipe.expire(freed_lock, 10)  # freed_lock expires in  10 seconds
+        pipe.expire(freed_lock, '10')  # freed_lock expires in  10 seconds
         pipe.execute()
         
         if v in self.locks:
@@ -124,7 +124,7 @@ class HungryHungryHippos(object):
             
             # self.log(u'renewing lock {} to expire in {} seconds'.format(keepalive_key, sleep*2)
             # set it to expire further in the future
-            self.r.expire(keepalive_key, sleep + 2)   
+            self.r.expire(keepalive_key, str(sleep + 2))   
             time.sleep(sleep)
 
     def _get_lock_uuid(self):
@@ -153,7 +153,7 @@ class HungryHungryHippos(object):
         pipe = self.r.pipeline()
         pipe.rpush(lock_key, lock_uuid)
         pipe.rpush(keepalive_key, lock_uuid)
-        pipe.expire(keepalive_key, 3)  # queue for long expiry right away
+        pipe.expire(keepalive_key, '3')  # queue for long expiry right away
         result = pipe.execute()
         
         # self.log(result
