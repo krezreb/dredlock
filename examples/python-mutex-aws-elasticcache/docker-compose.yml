@@ -3,5 +3,8 @@ version : '2'
 services:
         
     handle:
+        network_mode: host
         restart: "no"
         build: .
+        env_file:
+           - .env        

@@ -7,6 +7,11 @@ import time
 
 REDIS_NAMESPACE=os.getenv('REDIS_NAMESPACE', 'default')
 REDIS_HOST=os.getenv('REDIS_HOST', '127.0.0.1')
+
+REDIS_HOST_0=os.getenv('REDIS_HOST_0', '127.0.0.1')
+REDIS_HOST_1=os.getenv('REDIS_HOST_1', '127.0.0.1')
+
+
 REDIS_PORT=os.getenv('REDIS_PORT', 6379)
 
 from hungry_hungry_hippos import HungryHungryHippos
@@ -14,12 +19,15 @@ from hungry_hungry_hippos import HungryHungryHippos
 key="locks hey there: 1 bro -f"
 val=1
 
-from rediscluster import StrictRedisCluster
+from rediscluster import RedisCluster
+
 
 print REDIS_HOST
 
-startup_nodes = [{"host": REDIS_HOST, "port": REDIS_PORT}]
-rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True, skip_full_coverage_check=True)
+startup_nodes = [{"host": REDIS_HOST_0, "port": REDIS_PORT},{"host": REDIS_HOST_1, "port": REDIS_PORT}]
+
+
+rc = RedisCluster(startup_nodes=startup_nodes, decode_responses=True, skip_full_coverage_check=True)
 
 hhh = HungryHungryHippos(redis_client=rc, namespace=REDIS_NAMESPACE)
     

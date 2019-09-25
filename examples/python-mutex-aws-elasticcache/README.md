@@ -4,6 +4,9 @@ This example shows how to make and catch a mutex lock.  The included script, mut
 but create a lock, attempt to acquire it.  If it successfully aquires the lock it will do a 5 second countdown
 before releaseing.  The other losing containers will wait until the lock has been released and then quit.
 
+This can be used in conjuction with an ssh tunnel if you're testing a live AWS elasticcache instance
+
+
 Run the commands below
 
 
