@@ -7,8 +7,6 @@ services:
         build: .
         links:
             - redis:redis
-        env_file: 
-            - .env
         command: python -u hello-world.py
     
     redis:

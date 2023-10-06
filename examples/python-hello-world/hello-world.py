@@ -1,8 +1,10 @@
+#!/usr/bin/python3
+
 # -*- coding: utf-8 -*-
 
 import os, sys
 
-print sys.argv 
+print (sys.argv )
 
 from hungry_hungry_hippos import HungryHungryHippos
 
