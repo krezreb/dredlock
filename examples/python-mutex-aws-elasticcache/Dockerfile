@@ -5,7 +5,7 @@ WORKDIR /usr/app
 
 
 RUN pip install "redis>=3.0.0,<3.1.0"
-RUN pip install hungry-hungry-hippos redis-py-cluster
+RUN pip install dredlock redis-py-cluster
 
 COPY *py /usr/app/
 

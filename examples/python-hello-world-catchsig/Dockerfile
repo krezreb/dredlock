@@ -5,7 +5,7 @@ WORKDIR /usr/app
 
 COPY examples/python-hello-world-catchsig/*py /usr/app/
 
-COPY hungry_hungry_hippos/*py /usr/app/
+COPY dredlock/*py /usr/app/
 
 RUN pip install redis
 

@@ -6,7 +6,7 @@
 
 # Intro
 
-Hungry Hungry Hippos, (HHH) is a python implementation of redlock https://redis.io/topics/distlock with a set of examples that use docker, redis and docker compose.
+dredlock is a python implementation of redlock https://redis.io/topics/distlock with a set of examples that use docker, redis and docker compose.
 The advantage of this approch, compared to multithreading, is that is can be applied in a single-threaded context (for example if you have to integrate existing code), or in a mutliple container instance context (think microservices) 
 
 # Features
@@ -30,6 +30,6 @@ The advantage of this approch, compared to multithreading, is that is can be app
 
 # Installation
 
-<code>pip install hungry-hungry-hippos</code>
+<code>pip install dredlock</code>
 
 See examples for use cases

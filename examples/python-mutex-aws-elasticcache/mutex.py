@@ -14,7 +14,7 @@ REDIS_HOST_1=os.getenv('REDIS_HOST_1', '127.0.0.1')
 
 REDIS_PORT=os.getenv('REDIS_PORT', 6379)
 
-from hungry_hungry_hippos import HungryHungryHippos
+from dredlock import Dredlock
 
 key="locks hey there: 1 bro -f"
 val=1
@@ -29,7 +29,7 @@ startup_nodes = [{"host": REDIS_HOST_0, "port": REDIS_PORT},{"host": REDIS_HOST_
 
 rc = RedisCluster(startup_nodes=startup_nodes, decode_responses=True, skip_full_coverage_check=True)
 
-hhh = HungryHungryHippos(redis_client=rc, namespace=REDIS_NAMESPACE)
+hhh = Dredlock(redis_client=rc, namespace=REDIS_NAMESPACE)
     
 lock_lists = (key)
 

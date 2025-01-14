@@ -3,10 +3,10 @@
 
 import os, sys
 
-from hungry_hungry_hippos import HungryHungryHipposCatchSignals
+from dredlock import DredlockCatchSignals
 
 keys = ("jobs")
-hhh = HungryHungryHipposCatchSignals()
+hhh = DredlockCatchSignals()
 
 print ('connecting to redis')
 

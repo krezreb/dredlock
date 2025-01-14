@@ -1,10 +1,11 @@
-version : '2'
-
 services:
         
     handle:
         restart: "no"
-        build: .
+        build: 
+            context: ../../
+            dockerfile: ./examples/python-hello-world/Dockerfile
+
         links:
             - redis:redis
         command: python -u hello-world.py

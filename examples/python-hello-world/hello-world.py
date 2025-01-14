@@ -6,10 +6,10 @@ import os, sys
 
 print (sys.argv )
 
-from hungry_hungry_hippos import HungryHungryHippos
+from dredlock import Dredlock
 
 keys = ("jobs")
-hhh = HungryHungryHippos()
+hhh = Dredlock()
 
 print('Entering while true loop, awaiting messages')
 while True:

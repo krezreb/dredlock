@@ -4,7 +4,7 @@
 import os, sys
 print (sys.argv )
 
-from hungry_hungry_hippos import HungryHungryHippos
+from dredlock import Dredlock
 
 try:
     key = sys.argv[1]
@@ -17,7 +17,7 @@ except IndexError:
     val = "test"  
     
     
-hhh = HungryHungryHippos()
+hhh = Dredlock()
 
 print ('pushing {} to {}'.format(val, key))
 hhh.r.rpush(key, val)

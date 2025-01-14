@@ -34,12 +34,12 @@ exit()
 
 
 
-from hungry_hungry_hippos import HungryHungryHippos
+from dredlock import Dredlock
 
 
-hhh = HungryHungryHippos(host=args.redis_host, port=args.redis_port)
+hhh = Dredlock(host=args.redis_host, port=args.redis_port)
 
 
-hhh = HungryHungryHippos(redis_client=rc)
+hhh = Dredlock(redis_client=rc)
 
 # from here on out the rest is same as always

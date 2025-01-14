@@ -8,7 +8,7 @@ import threading
 import signal
 import sys, logging
 
-class HungryHungryHippos(object):
+class Dredlock(object):
 
     def __init__(self, host='redis', port=6379, db=0, logger=None, namespace='default', redis_client=None):
         
@@ -22,7 +22,7 @@ class HungryHungryHippos(object):
         self.locks = []
         
         if logger == None:
-            self.logger = logging.getLogger('hungry_hungry_hippos')
+            self.logger = logging.getLogger('dredlock')
             self.logger.setLevel(logging.DEBUG)
 
             ch = logging.StreamHandler(stream=sys.stdout)
@@ -194,7 +194,7 @@ class ExitSignalCaught(Exception):
     pass
 
 
-class HungryHungryHipposCatchSignals(HungryHungryHippos):
+class DredlockCatchSignals(Dredlock):
     kill_now = False
 
     def __init__(self, **kwargs):
@@ -209,7 +209,7 @@ class HungryHungryHipposCatchSignals(HungryHungryHippos):
         if self.kill_now == True:
             raise ExitSignalCaught()
 
-        (k, v) = super(HungryHungryHipposCatchSignals, self).blpop(keys)
+        (k, v) = super(DredlockCatchSignals, self).blpop(keys)
         
         if self.kill_now == True:
             self.r.rpush(k, v)
@@ -221,7 +221,7 @@ class HungryHungryHipposCatchSignals(HungryHungryHippos):
         if self.kill_now == True:
             raise ExitSignalCaught()
         
-        (lock_success, k, v) = super(HungryHungryHipposCatchSignals, self).blpop_lock(keys)
+        (lock_success, k, v) = super(DredlockCatchSignals, self).blpop_lock(keys)
         
         if self.kill_now == True:
             if lock_success == True:

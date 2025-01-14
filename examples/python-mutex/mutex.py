@@ -4,13 +4,13 @@ import os, sys
 
 import time
 import random 
-from hungry_hungry_hippos import HungryHungryHippos
+from dredlock import Dredlock
 
 key="locks"
 val="foo"
 
 lock_lists = (key)
-hhh = HungryHungryHippos()
+hhh = Dredlock()
 
 # here we make the lock
 hhh.r.rpush(key, val)

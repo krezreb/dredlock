@@ -3,8 +3,10 @@ FROM python:3
 RUN mkdir -p /usr/app/
 WORKDIR /usr/app
 
-RUN pip3 install hungry-hungry-hippos
+COPY dredlock/*py /usr/app/
+RUN pip install redis
 
-COPY *py /usr/app/
+COPY examples/python-hello-world/*py /usr/app/
+
 
 CMD ["python",  "hello-world.py"] 
