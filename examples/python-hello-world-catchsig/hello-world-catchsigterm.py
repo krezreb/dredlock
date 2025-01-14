@@ -3,38 +3,29 @@
 
 import os, sys
 
-print sys.argv 
-
 from hungry_hungry_hippos import HungryHungryHipposCatchSignals
 
 keys = ("jobs")
 hhh = HungryHungryHipposCatchSignals()
 
-print 'connecting to redis'
+print ('connecting to redis')
 
 import signal
 import time
 
-class GracefulKiller(object):
-    kill_now = False
-    def __init__(self):
-        signal.signal(signal.SIGINT, self.exit_gracefully)
-        signal.signal(signal.SIGTERM, self.exit_gracefully)
+def exit_gracefully(signum, frame):
+    print('Caught a signal {}, exiting'.format(signum))
+    exit()
 
-    def exit_gracefully(self, signum, frame):
-        print 'got a sig {}'.format(signum)
-        self.kill_now = True
-    
+signal.signal(signal.SIGTERM, exit_gracefully)
 
-killer = GracefulKiller()
+print ('Entering while true loop')
 
 while True:
-    print 'while true'
+    print ('blpop...')
     (k,v) = hhh.blpop(keys)
-    print "got a {} {}".format(k,v)
+    print ("got a {} {}".format(k,v))
     time.sleep(1)
-    if killer.kill_now:
-        print "just got told to quit. Exiting"
-        break
+
   
   

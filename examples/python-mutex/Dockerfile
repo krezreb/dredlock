@@ -1,10 +1,12 @@
-FROM python:2.7
+FROM python:3
 
 RUN mkdir -p /usr/app/
 WORKDIR /usr/app
 
-RUN pip install hungry-hungry-hippos
+COPY examples/python-mutex/*py /usr/app/
 
-COPY *py /usr/app/
+COPY hungry_hungry_hippos/*py /usr/app/
 
-CMD python -u mutex.py
+RUN pip install redis
+
+CMD ["python", "-u",  "mutex.py"]

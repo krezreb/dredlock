@@ -2,7 +2,7 @@
 #!/usr/bin/python
 
 import os, sys
-print sys.argv 
+print (sys.argv )
 
 from hungry_hungry_hippos import HungryHungryHippos
 
@@ -19,6 +19,5 @@ except IndexError:
     
 hhh = HungryHungryHippos()
 
-print 'pushing {} to {}'.format(val, key)
-
+print ('pushing {} to {}'.format(val, key))
 hhh.r.rpush(key, val)

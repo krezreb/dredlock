@@ -1,10 +1,12 @@
-FROM python:2.7
+FROM python:3
 
 RUN mkdir -p /usr/app/
 WORKDIR /usr/app
 
-RUN pip install hungry-hungry-hippos
+COPY examples/python-hello-world-catchsig/*py /usr/app/
 
-COPY *py /usr/app/
+COPY hungry_hungry_hippos/*py /usr/app/
 
-CMD python -u hello-world-catchsigterm.py 
+RUN pip install redis
+
+CMD ["python3",  "-u",  "hello-world-catchsigterm.py"]

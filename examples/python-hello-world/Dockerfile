@@ -7,4 +7,4 @@ RUN pip3 install hungry-hungry-hippos
 
 COPY *py /usr/app/
 
-CMD python hello-world.py 
+CMD ["python",  "hello-world.py"] 

@@ -67,7 +67,7 @@ class HungryHungryHippos(object):
             self.locks.remove(v)
         
         
-    def wait_for_lock(self, v, timeout=None):
+    def wait_for_lock(self, v, timeout=-1):
         (lock_key, keepalive_key, freed_lock) = self._getkeys(v)
         
         pipe = self.r.pipeline()
@@ -98,7 +98,7 @@ class HungryHungryHippos(object):
             # wait here indefinitely
             self.r.brpoplpush(freed_lock, freed_lock)
             
-        # lock ahs been freed
+        # lock has been freed
         
     def lock_keepalive(self, v, lock_uuid, sleep=10):
         self.log(u'Starting lock renewal thread for {} with uuid={}'.format(v, lock_uuid))
@@ -178,10 +178,10 @@ class HungryHungryHippos(object):
                 # no previous keepalive lock, looks like I got a stale lock
                 self.release_lock(v)
                 
-                # put it back on the shelf for the next person
+                # put it back on the shelf so it is not lost
                 self.r.lpush(k, v)
                 # I don't have the lock
-                self.log("Found a stale lock {} putting it back in the front of the line".format(v))
+                self.log("Found a stale lock {} putting it back in the front of the list".format(v))
                 
             else:
                 # I don't have the lock
@@ -197,7 +197,8 @@ class ExitSignalCaught(Exception):
 class HungryHungryHipposCatchSignals(HungryHungryHippos):
     kill_now = False
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         signal.signal(signal.SIGINT, self.exit_gracefully)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
